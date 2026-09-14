@@ -1,0 +1,38 @@
+name: Build NetGuard for Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Extract source
+        shell: powershell
+        run: Expand-Archive NetGuard-source-0.2.zip -DestinationPath source
+
+      - name: Build program
+        shell: powershell
+        run: dotnet publish source/NetGuardFull/NetGuard.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o source/NetGuardFull/publish
+
+      - name: Install Inno Setup
+        shell: powershell
+        run: choco install innosetup --no-progress -y
+
+      - name: Build installer
+        shell: powershell
+        run: '& "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" source/NetGuardFull/installer.iss'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NetGuard-Windows-x64
+          path: source/NetGuardFull/installer-output/NetGuard-Setup-x64.exe
