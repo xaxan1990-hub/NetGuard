@@ -20,6 +20,14 @@ jobs:
         shell: powershell
         run: Expand-Archive NetGuard-source-0.2.zip -DestinationPath source
 
+      - name: Fix installer source
+        shell: powershell
+        run: |
+          $path = "source/NetGuardFull/installer.iss"
+          $lines = Get-Content $path
+          $lines[23] = $lines[23] + '"'
+          Set-Content $path $lines
+
       - name: Build program
         shell: powershell
         run: dotnet publish source/NetGuardFull/NetGuard.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o source/NetGuardFull/publish
