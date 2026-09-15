@@ -18,7 +18,7 @@ jobs:
 
       - name: Extract source
         shell: powershell
-        run: Expand-Archive NetGuard-source-0.6.zip -DestinationPath source
+        run: Expand-Archive NetGuard-source-0.9.zip -DestinationPath source
 
       - name: Build program
         shell: powershell
